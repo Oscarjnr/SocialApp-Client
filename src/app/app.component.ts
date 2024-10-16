@@ -1,26 +1,31 @@
 import { NgFor } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from "./navbar/navbar.component";
+import { AccountService } from './_services/account.service';
+import { HomepageComponent } from "./homepage/homepage.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NgFor],
+  imports: [RouterOutlet, NgFor, NavbarComponent, HomepageComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit{
-  http = inject(HttpClient);
-  title = 'Oscar';
-  users: any;
+  private accountService = inject(AccountService);
+  
 
   ngOnInit(): void {
-    this.http.get('https://localhost:7000/api/users').subscribe({
-      next: response => this.users = response,
-      error: error => console.log(error),
-      complete: () => console.log('Request completed')
-      
-    })
+    this.setLoggedInUser();
   }
+
+  setLoggedInUser() {
+    const userString = localStorage.getItem('user');
+    if (!userString) return;
+    const user = JSON.parse(userString);
+    this.accountService.loggedInUser.set(user);
+  }
+
+
 }
